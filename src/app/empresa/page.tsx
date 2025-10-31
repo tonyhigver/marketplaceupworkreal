@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-import CreateCampaignForm from "@/components/CreateCampaignForm";
 
 const projects = [
   { title: "Campaña TikTok viral", reward: 100 },
@@ -11,13 +10,8 @@ const projects = [
 export default function EmpresaPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header superior */}
+      {/* Header superior con botón de Crear Campaña */}
       <Header type="empresa" />
-
-      {/* Botón de Crear Campaña */}
-      <div className="p-4 flex justify-end">
-        <CreateCampaignForm />
-      </div>
 
       {/* Dashboard de proyectos */}
       <div className="p-10">
