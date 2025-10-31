@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-import CreateCampaignForm from "@/components/CreateCampaignForm"; // <-- formulario modal
+import CreateCampaignForm from "@/components/CreateCampaignForm";
 
 const projects = [
   { title: "Campaña TikTok viral", reward: 100 },
@@ -14,7 +14,7 @@ export default function EmpresaPage() {
       {/* Header superior */}
       <Header type="empresa" />
 
-      {/* Botón y modal de Crear Campaña */}
+      {/* Botón de Crear Campaña */}
       <div className="p-4 flex justify-end">
         <CreateCampaignForm />
       </div>
