@@ -1,3 +1,5 @@
+"use client"; // ⚠️ IMPORTANTE: convierte este archivo en Client Component
+
 import { useState } from "react";
 
 export default function CreateCampaignForm() {
@@ -8,8 +10,11 @@ export default function CreateCampaignForm() {
   const handleSubmit = () => {
     // Aquí enviarías los datos al backend
     console.log({ campaignName, budget });
+
+    // Cierra el modal
     setShowModal(false);
-    // Opcional: limpiar campos
+
+    // Limpiar campos
     setCampaignName("");
     setBudget(0);
   };
