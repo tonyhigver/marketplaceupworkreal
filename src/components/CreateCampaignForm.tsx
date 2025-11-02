@@ -4,49 +4,38 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
+  userId: string; // UUID real del usuario / empresa
   onCreateCampaign: (campaign: any) => void;
 }
 
-export default function CreateCampaignForm({ onCreateCampaign }: CreateCampaignFormProps) {
+export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateCampaignFormProps) {
   const [showModal, setShowModal] = useState(false);
 
-  // Campos de campaña
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState(0);
   const [objective, setObjective] = useState("");
 
-  // Campos de marca
   const [brandName, setBrandName] = useState("");
   const [brandValues, setBrandValues] = useState("");
   const [brandTone, setBrandTone] = useState("");
   const [brandAssets, setBrandAssets] = useState("");
 
-  // Público y contenido
   const [audience, setAudience] = useState("");
   const [contentType, setContentType] = useState("");
   const [contentGuidelines, setContentGuidelines] = useState("");
 
-  // Restricciones y métricas
   const [restrictions, setRestrictions] = useState("");
   const [rewards, setRewards] = useState("");
   const [successMetrics, setSuccessMetrics] = useState("");
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
-    // Obtener ID de usuario autenticado desde Supabase
-    const { data: userRes } = await supabase.auth.getUser();
-    const userId = userRes?.user?.id;
-    if (!userId) {
-      alert("No se encontró ID de usuario autenticado");
-      return;
-    }
-
     const campaignData = {
       campaign_name: campaignName || null,
-      start_date: startDate || null,
-      end_date: endDate || null,
+      start_date: startDate || null,  // <- Si está vacío, envia null
+      end_date: endDate || null,      // <- Si está vacío, envia null
       budget: budget || null,
       objective: objective || null,
       brand_name: brandName || null,
