@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ email?: string } | null>(null);
 
   // Revisar si hay token guardado en localStorage
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function Home() {
   }, []);
 
   const handleSignInWithGoogle = () => {
-    // Redirige al endpoint que inicia OAuth
+    // Redirige al endpoint API que inicia OAuth
     window.location.href = "/api/auth/google";
   };
 
@@ -37,7 +37,7 @@ export default function Home() {
     );
   }
 
-  // Usuario no autenticado
+  // Usuario NO autenticado → mostrar login
   if (!user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white p-6">
@@ -52,7 +52,10 @@ export default function Home() {
             className="w-full py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-lg font-semibold shadow-lg transition-all flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M21.35 11.1h-9.18v2.92h5.5c-.24 1.5-1.7 4.39-5.5 4.39-3.31 0-6-2.73-6-6.09s2.69-6.09 6-6.09c1.88 0 3.14.8 3.86 1.49l2.64-2.55C17.87 2.9 15.22 1.5 12 1.5 6.21 1.5 1.5 6.18 1.5 11.97S6.21 22.44 12 22.44c6.59 0 11.25-4.62 11.25-11.34 0-.77-.09-1.35-.1-1.99z" fill="white" />
+              <path
+                d="M21.35 11.1h-9.18v2.92h5.5c-.24 1.5-1.7 4.39-5.5 4.39-3.31 0-6-2.73-6-6.09s2.69-6.09 6-6.09c1.88 0 3.14.8 3.86 1.49l2.64-2.55C17.87 2.9 15.22 1.5 12 1.5 6.21 1.5 1.5 6.18 1.5 11.97S6.21 22.44 12 22.44c6.59 0 11.25-4.62 11.25-11.34 0-.77-.09-1.35-.1-1.99z"
+                fill="white"
+              />
             </svg>
             Iniciar sesión con Google
           </button>
@@ -65,7 +68,7 @@ export default function Home() {
     );
   }
 
-  // Usuario autenticado
+  // Usuario autenticado → mostrar la UI principal (redirección implícita)
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white">
       <h1 className="text-4xl font-bold mb-10">Bienvenido a BrandHub</h1>
