@@ -1,23 +1,39 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-
-const projects = [
-  { title: "Video creativo TikTok", reward: 50 },
-  { title: "Post viral Instagram", reward: 75 },
-  { title: "Diseño meme promocional", reward: 30 },
-];
+import { supabase } from "@/lib/supabaseClient";
 
 export default function IndividualPage() {
-  const userConnects = 15; // puedes reemplazarlo con valor dinámico del usuario
+  const userId = "individual-123"; // reemplazar con el id real del usuario
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+
+  const fetchCampaigns = async () => {
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select("*")
+      .eq("created_by", userId);
+    if (error) console.error(error);
+    else setCampaigns(data || []);
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Header type="individual" connects={userConnects} />
+      <Header type="individual" connects={15} />
+
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Individual 🙋</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((p, i) => (
-            <ProjectCard key={i} title={p.title} reward={p.reward} />
+
+        {campaigns.length === 0 && <p className="text-gray-400">No tienes campañas asignadas todavía.</p>}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          {campaigns.map((c, i) => (
+            <ProjectCard key={i} title={c.campaign_name} reward={c.budget} />
           ))}
         </div>
       </div>
