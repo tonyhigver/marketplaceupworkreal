@@ -4,11 +4,10 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
-  userId: string; // UUID real del usuario / empresa
   onCreateCampaign: (campaign: any) => void;
 }
 
-export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateCampaignFormProps) {
+export default function CreateCampaignForm({ onCreateCampaign }: CreateCampaignFormProps) {
   const [showModal, setShowModal] = useState(false);
 
   const [campaignName, setCampaignName] = useState("");
@@ -32,10 +31,17 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
+    const { data: userRes } = await supabase.auth.getUser();
+    const userId = userRes?.user?.id; // <-- UUID REAL DEL USUARIO
+    if (!userId) {
+      alert("No se encontró ID de usuario autenticado");
+      return;
+    }
+
     const campaignData = {
       campaign_name: campaignName || null,
-      start_date: startDate || null,  // <- Si está vacío, envia null
-      end_date: endDate || null,      // <- Si está vacío, envia null
+      start_date: startDate || null,
+      end_date: endDate || null,
       budget: budget || null,
       objective: objective || null,
       brand_name: brandName || null,
@@ -49,7 +55,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: userId, // UUID real
+      created_by: userId, // <-- AHORA SIEMPRE UUID
     };
 
     console.log("📤 Enviando campaña a Supabase:", campaignData);
@@ -71,7 +77,6 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       onCreateCampaign(data);
       setShowModal(false);
 
-      // Limpiar campos
       setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(0); setObjective("");
       setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
       setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
