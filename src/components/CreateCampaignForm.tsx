@@ -11,56 +11,45 @@ interface CreateCampaignFormProps {
 export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateCampaignFormProps) {
   const [showModal, setShowModal] = useState(false);
 
-  // Información básica
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState(0);
   const [objective, setObjective] = useState("");
 
-  // Información de la marca
   const [brandName, setBrandName] = useState("");
   const [brandValues, setBrandValues] = useState("");
   const [brandTone, setBrandTone] = useState("");
   const [brandAssets, setBrandAssets] = useState("");
 
-  // Público objetivo
   const [audience, setAudience] = useState("");
-
-  // Tipo de contenido
   const [contentType, setContentType] = useState("");
   const [contentGuidelines, setContentGuidelines] = useState("");
 
-  // Reglas y restricciones
   const [restrictions, setRestrictions] = useState("");
-
-  // Incentivos / métricas
   const [rewards, setRewards] = useState("");
   const [successMetrics, setSuccessMetrics] = useState("");
-
-  // Material de referencia
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
-    // Construimos el objeto de campaña
     const campaignData = {
-      campaign_name: campaignName,
-      start_date: startDate, // YYYY-MM-DD
-      end_date: endDate,     // YYYY-MM-DD
-      budget,
-      objective,
-      brand_name: brandName,
-      brand_values: brandValues,
-      brand_tone: brandTone,
-      brand_assets: brandAssets,
-      audience,
-      content_type: contentType,
-      content_guidelines: contentGuidelines,
-      restrictions,
-      rewards,
-      success_metrics: successMetrics,
-      references,
-      created_by: userId, // Debe ser un UUID válido
+      campaign_name: campaignName || null,
+      start_date: startDate || null,  // <- Si está vacío, envia null
+      end_date: endDate || null,      // <- Si está vacío, envia null
+      budget: budget || null,
+      objective: objective || null,
+      brand_name: brandName || null,
+      brand_values: brandValues || null,
+      brand_tone: brandTone || null,
+      brand_assets: brandAssets || null,
+      audience: audience || null,
+      content_type: contentType || null,
+      content_guidelines: contentGuidelines || null,
+      restrictions: restrictions || null,
+      rewards: rewards || null,
+      success_metrics: successMetrics || null,
+      references: references || null,
+      created_by: userId, // UUID real
     };
 
     console.log("📤 Enviando campaña a Supabase:", campaignData);
