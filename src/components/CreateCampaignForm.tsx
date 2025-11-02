@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
-  userId: string; // id del usuario / empresa
+  userId: string; // UUID real del usuario / empresa
   onCreateCampaign: (campaign: any) => void;
 }
 
@@ -42,10 +42,11 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
+    // Construimos el objeto de campaña
     const campaignData = {
       campaign_name: campaignName,
-      start_date: startDate,
-      end_date: endDate,
+      start_date: startDate, // YYYY-MM-DD
+      end_date: endDate,     // YYYY-MM-DD
       budget,
       objective,
       brand_name: brandName,
@@ -59,31 +60,38 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards,
       success_metrics: successMetrics,
       references,
-      created_by: userId,
+      created_by: userId, // Debe ser un UUID válido
     };
 
     console.log("📤 Enviando campaña a Supabase:", campaignData);
 
-    const { data, error } = await supabase
-      .from("campaigns")
-      .insert([campaignData])
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("campaigns")
+        .insert([campaignData])
+        .select()
+        .single();
 
-    if (error) {
-      console.error("❌ Error creando campaña:", error.message);
-      return;
+      if (error) {
+        console.error("❌ Error creando campaña:", error);
+        alert("Error creando campaña: " + error.message);
+        return;
+      }
+
+      console.log("✅ Campaña guardada en Supabase:", data);
+      onCreateCampaign(data);
+      setShowModal(false);
+
+      // Limpiar campos
+      setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(0); setObjective("");
+      setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
+      setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
+      setRewards(""); setSuccessMetrics(""); setReferences("");
+
+    } catch (err) {
+      console.error("💥 Error inesperado:", err);
+      alert("Error inesperado al crear la campaña");
     }
-
-    console.log("✅ Campaña guardada en Supabase:", data);
-    onCreateCampaign(data);
-    setShowModal(false);
-
-    // Limpiar campos
-    setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(0); setObjective("");
-    setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
-    setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
-    setRewards(""); setSuccessMetrics(""); setReferences("");
   };
 
   return (
