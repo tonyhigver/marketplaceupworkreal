@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 
-export default function CreateCampaignForm() {
+interface CreateCampaignFormProps {
+  onCreateCampaign: (campaign: any) => void; // callback al padre
+}
+
+export default function CreateCampaignForm({ onCreateCampaign }: CreateCampaignFormProps) {
   const [showModal, setShowModal] = useState(false);
 
   // Información básica
@@ -55,7 +59,9 @@ export default function CreateCampaignForm() {
       references,
     };
 
-    console.log(campaignData);
+    // Enviar los datos al padre
+    onCreateCampaign(campaignData);
+
     setShowModal(false);
 
     // Limpiar campos
@@ -92,7 +98,6 @@ export default function CreateCampaignForm() {
             <h2 className="text-xl font-bold mb-4">Nueva Campaña</h2>
 
             <div className="grid gap-3">
-              {/* Información básica */}
               <input
                 type="text"
                 placeholder="Nombre de la campaña"
@@ -129,7 +134,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Información de la marca */}
               <input
                 type="text"
                 placeholder="Nombre de la marca"
@@ -158,7 +162,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Público objetivo */}
               <textarea
                 placeholder="Descripción del público objetivo"
                 value={audience}
@@ -166,7 +169,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Tipo de contenido */}
               <input
                 type="text"
                 placeholder="Tipo de contenido"
@@ -181,7 +183,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Reglas y restricciones */}
               <textarea
                 placeholder="Reglas y restricciones"
                 value={restrictions}
@@ -189,7 +190,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Incentivos / métricas */}
               <input
                 type="text"
                 placeholder="Recompensas / incentivos"
@@ -204,7 +204,6 @@ export default function CreateCampaignForm() {
                 className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
               />
 
-              {/* Material de referencia */}
               <textarea
                 placeholder="Material de referencia / links"
                 value={references}
