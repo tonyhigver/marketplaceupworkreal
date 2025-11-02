@@ -62,6 +62,8 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       created_by: userId,
     };
 
+    console.log("📤 Enviando campaña a Supabase:", campaignData);
+
     const { data, error } = await supabase
       .from("campaigns")
       .insert([campaignData])
@@ -69,10 +71,11 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       .single();
 
     if (error) {
-      console.error("Error creando campaña:", error.message);
+      console.error("❌ Error creando campaña:", error.message);
       return;
     }
 
+    console.log("✅ Campaña guardada en Supabase:", data);
     onCreateCampaign(data);
     setShowModal(false);
 
@@ -111,7 +114,6 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
               <input type="text" placeholder="Link a assets / guía de estilo" value={brandAssets} onChange={(e) => setBrandAssets(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
 
               <textarea placeholder="Descripción del público objetivo" value={audience} onChange={(e) => setAudience(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-
               <input type="text" placeholder="Tipo de contenido" value={contentType} onChange={(e) => setContentType(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <textarea placeholder="Guías de contenido" value={contentGuidelines} onChange={(e) => setContentGuidelines(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
 

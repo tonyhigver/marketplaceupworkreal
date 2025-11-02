@@ -15,8 +15,11 @@ export default function EmpresaPage() {
       .from("campaigns")
       .select("*")
       .eq("created_by", userId);
-    if (error) console.error(error);
-    else setCampaigns(data || []);
+    if (error) console.error("❌ Error fetching campaigns:", error);
+    else {
+      console.log("📥 Campañas cargadas:", data);
+      setCampaigns(data || []);
+    }
   };
 
   useEffect(() => {
