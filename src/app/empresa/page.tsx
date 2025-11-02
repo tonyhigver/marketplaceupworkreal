@@ -8,6 +8,7 @@ import CreateCampaignForm from "@/components/CreateCampaignForm";
 export default function EmpresaPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
+  // Función que recibe la campaña creada desde el formulario
   const handleCreateCampaign = (campaign: any) => {
     setCampaigns((prev) => [...prev, campaign]);
   };
@@ -15,16 +16,11 @@ export default function EmpresaPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header superior con botón de Crear Campaña */}
-      <Header type="empresa" />
+      <Header type="empresa" onCreateCampaign={handleCreateCampaign} />
 
       {/* Dashboard de proyectos */}
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Empresa / Startup 🚀</h2>
-
-        {/* Botón Crear Campaña (también se puede mantener en Header) */}
-        <div className="mb-6">
-          <CreateCampaignForm onCreateCampaign={handleCreateCampaign} />
-        </div>
 
         {campaigns.length === 0 && (
           <p className="text-gray-400">No tienes campañas creadas todavía.</p>
