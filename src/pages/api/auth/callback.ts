@@ -7,8 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const code = req.query.code as string;
 
     if (!code) {
-      res.status(400).json({ error: "Missing code query parameter" });
-      return;
+      return res.status(400).json({ error: "Falta el parámetro 'code' en la query" });
     }
 
     const client_id = process.env.GOOGLE_CLIENT_ID;
@@ -16,8 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const redirect_uri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
 
     if (!client_id || !client_secret || !redirect_uri) {
-      res.status(500).json({ error: "Missing Google OAuth environment variables" });
-      return;
+      return res.status(500).json({ error: "Faltan variables de entorno de Google OAuth" });
     }
 
     const params = new URLSearchParams();
@@ -35,19 +33,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!response.ok) {
       const text = await response.text();
-      console.error("Google OAuth token error:", text);
-      res.status(500).json({ error: "Failed to exchange code for token" });
-      return;
+      console.error("Error intercambiando código por token:", text);
+      return res.status(500).json({ error: "Error al intercambiar código por token" });
     }
 
     const data = await response.json();
 
-    console.log("Google OAuth Response:", data);
+    console.log("Respuesta Google OAuth:", data);
 
-    // Redirige al frontend con el token
+    // Redirige al frontend con el token de acceso
     res.redirect(`/dashboard?token=${data.access_token}`);
   } catch (err) {
-    console.error("Unexpected error in Google OAuth callback:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error inesperado en callback de Google OAuth:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
