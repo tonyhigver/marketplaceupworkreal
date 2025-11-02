@@ -1,5 +1,4 @@
-// C:\Proyectos\marketplaceupworkreal\marketplaceupworkreal\src\pages\api\auth\callback.ts
-
+// src/pages/api/auth/callback.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -41,8 +40,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log("Respuesta Google OAuth:", data);
 
-    // Redirige al frontend con el token de acceso
-    res.redirect(`/dashboard?token=${data.access_token}`);
+    // ✅ Cambiado para que redirija a la página principal
+    const email = data.id_token ? JSON.parse(Buffer.from(data.id_token.split(".")[1], "base64").toString()).email : "";
+    res.redirect(`/?token=${data.access_token}&email=${email}`);
   } catch (err) {
     console.error("Error inesperado en callback de Google OAuth:", err);
     res.status(500).json({ error: "Error interno del servidor" });
