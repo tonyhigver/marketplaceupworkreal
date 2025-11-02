@@ -2,65 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
 
-  // Chequea sesión al montar y subscribirse a cambios de auth
+  // Revisar si hay token guardado en localStorage
   useEffect(() => {
-    let mounted = true;
-
-    const check = async () => {
-      const { data: sessionData, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error getting session:", error);
-      }
-      if (!mounted) return;
-      setUser(sessionData?.session?.user ?? null);
-      setLoading(false);
-    };
-
-    check();
-
-    // Subscribe a cambios de auth (login/logout)
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      mounted = false;
-      listener.subscription.unsubscribe();
-    };
+    const token = localStorage.getItem("google_access_token");
+    const email = localStorage.getItem("google_user_email");
+    if (token) {
+      setUser({ email: email ?? undefined });
+    }
+    setLoading(false);
   }, []);
 
-  const handleSignInWithGoogle = async () => {
-    try {
-      setErrorMsg(null);
-      // Esto redirige al flujo OAuth de Supabase/Google
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          // scopes opcionales, p. ej. "email profile openid"
-          scopes: "email profile openid",
-        },
-      });
-      if (error) {
-        console.error("Error signInWithOAuth:", error);
-        setErrorMsg(error.message);
-      }
-      // después de esto, Supabase redirigirá a la consola de Google y volverá al callback de Supabase
-    } catch (err: any) {
-      console.error("Unexpected error on sign in:", err);
-      setErrorMsg(err?.message ?? "Error desconocido");
-    }
+  const handleSignInWithGoogle = () => {
+    // Redirige al endpoint que inicia OAuth
+    window.location.href = "/api/auth/google";
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = () => {
+    localStorage.removeItem("google_access_token");
+    localStorage.removeItem("google_user_email");
     setUser(null);
   };
 
@@ -72,7 +37,7 @@ export default function Home() {
     );
   }
 
-  // Si NO hay usuario autenticado → mostrar CTA de login con Google
+  // Usuario no autenticado
   if (!user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white p-6">
@@ -93,21 +58,19 @@ export default function Home() {
           </button>
 
           <div className="text-center text-sm text-gray-400">
-            O crea una cuenta con tu correo (habilítalo en Supabase si quieres).
+            O crea una cuenta con tu correo (si quieres implementar email/password).
           </div>
-
-          {errorMsg && <div className="text-red-400 text-sm mt-2">{errorMsg}</div>}
         </div>
       </div>
     );
   }
 
-  // Si hay usuario autenticado → mostrar la UI original
+  // Usuario autenticado
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white">
       <h1 className="text-4xl font-bold mb-10">Bienvenido a BrandHub</h1>
       <div className="text-sm text-gray-300 mb-6">
-        Conectado como <span className="font-medium">{user.email ?? user.id}</span>
+        Conectado como <span className="font-medium">{user.email ?? "Usuario"}</span>
       </div>
 
       <div className="flex flex-col gap-6 w-full max-w-sm">
