@@ -11,21 +11,26 @@ export default function Home() {
 
   useEffect(() => {
     const checkSession = async () => {
+      // 🔹 Obtener sesión actual
       const { data, error } = await supabase.auth.getSession();
-      if (error) console.error("❌ Error al obtener sesión:", error.message);
+      if (error) {
+        console.error("❌ Error al obtener sesión:", error.message);
+      }
 
       if (data?.session?.user) {
         console.log("✅ Sesión activa:", data.session.user.email);
         setUser(data.session.user);
-        router.replace("/empresa"); // 🚀 va al dashboard empresa
+        router.replace("/empresa"); // 🚀 redirige si ya está logueado
       } else {
         console.log("⚠️ No hay sesión activa");
       }
+
       setLoading(false);
     };
 
     checkSession();
 
+    // 🔹 Escucha cambios de sesión (login/logout)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         console.log("🔄 Usuario logueado:", session.user.email);
@@ -37,21 +42,28 @@ export default function Home() {
       }
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, [router]);
 
+  // ✅ Login con Google
   const handleLogin = async () => {
     const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+    console.log("🌍 redirectUrl:", redirectUrl);
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: redirectUrl, // 🔹 vuelve a la raíz (Home)
+        redirectTo: `${redirectUrl}/`, // 👈 vuelve a la raíz
       },
     });
 
     if (error) console.error("❌ Error al iniciar sesión:", error.message);
   };
 
+  // 🌀 Pantalla de carga
   if (loading)
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950 text-white">
@@ -59,6 +71,7 @@ export default function Home() {
       </div>
     );
 
+  // 🚪 Usuario no logueado → pantalla de login
   if (!user)
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white p-6">
@@ -75,6 +88,7 @@ export default function Home() {
       </div>
     );
 
+  // 🚀 Usuario logueado → redirigiendo
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-950 text-white">
       <p>Redirigiendo al dashboard...</p>
