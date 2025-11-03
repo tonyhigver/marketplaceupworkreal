@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
-  userId: string; // Puedes pasar el userId obtenido desde tu callback de login
+  userId: string; // UUID del usuario logueado
   onCreateCampaign: (campaign: any) => void;
 }
 
@@ -14,7 +14,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [budget, setBudget] = useState(0);
+  const [budget, setBudget] = useState<number | null>(null);
   const [objective, setObjective] = useState("");
 
   const [brandName, setBrandName] = useState("");
@@ -37,6 +37,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       return;
     }
 
+    // Preparamos datos, pasando null en campos vacíos
     const campaignData = {
       campaign_name: campaignName || null,
       start_date: startDate || null,
@@ -54,10 +55,10 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: userId, // usamos directamente el userId
+      created_by: userId, // ✅ usamos el UUID del usuario
     };
 
-    console.log("📤 Enviando campaña a Supabase:", campaignData);
+    console.log("📤 Creando campaña con datos:", campaignData);
 
     try {
       const { data, error } = await supabase
@@ -72,18 +73,18 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
         return;
       }
 
-      console.log("✅ Campaña guardada en Supabase:", data);
+      console.log("✅ Campaña creada:", data);
       onCreateCampaign(data);
       setShowModal(false);
 
       // Limpiar campos
-      setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(0); setObjective("");
+      setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(null); setObjective("");
       setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
       setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
       setRewards(""); setSuccessMetrics(""); setReferences("");
 
     } catch (err) {
-      console.error("💥 Error inesperado:", err);
+      console.error("💥 Error inesperado al crear campaña:", err);
       alert("Error inesperado al crear la campaña");
     }
   };
@@ -107,7 +108,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
                 <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
                 <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               </div>
-              <input type="number" placeholder="Presupuesto" value={budget} onChange={(e) => setBudget(Number(e.target.value))} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="number" placeholder="Presupuesto" value={budget ?? ""} onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Objetivo principal" value={objective} onChange={(e) => setObjective(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
 
               <input type="text" placeholder="Nombre de la marca" value={brandName} onChange={(e) => setBrandName(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
