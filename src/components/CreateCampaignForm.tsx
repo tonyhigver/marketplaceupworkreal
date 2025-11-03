@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
-  userId: string; // UUID del usuario logueado
+  userId: string; // UUID real del usuario logueado
   onCreateCampaign: (campaign: any) => void;
 }
 
@@ -54,10 +54,8 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: userId, // ✅ Usamos el UUID real
+      created_by: userId, // ✅ UUID real
     };
-
-    console.log("📤 Creando campaña con datos:", campaignData);
 
     try {
       const { data, error } = await supabase
@@ -72,7 +70,6 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
         return;
       }
 
-      console.log("✅ Campaña creada:", data);
       onCreateCampaign(data);
       setShowModal(false);
 
@@ -81,7 +78,6 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
       setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
       setRewards(""); setSuccessMetrics(""); setReferences("");
-
     } catch (err) {
       console.error("💥 Error inesperado al crear campaña:", err);
       alert("Error inesperado al crear la campaña");
