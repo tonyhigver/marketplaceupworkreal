@@ -6,10 +6,30 @@ import ProjectCard from "@/components/ProjectCard";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function IndividualPage() {
-  const userId = "individual-123"; // reemplazar con el id real del usuario
+  const [userId, setUserId] = useState<string | null>(null); // UUID real del usuario
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
+  // Obtener la sesión de Supabase al cargar
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("❌ Error obteniendo sesión:", error);
+        return;
+      }
+      if (session?.user?.id) {
+        console.log("✅ UUID del usuario logueado (individual):", session.user.id);
+        setUserId(session.user.id);
+      } else {
+        console.warn("⚠️ No hay usuario logueado");
+      }
+    };
+    fetchSession();
+  }, []);
+
   const fetchCampaigns = async () => {
+    if (!userId) return;
+    console.log("📥 Cargando campañas para userId (individual):", userId);
     const { data, error } = await supabase
       .from("campaigns")
       .select("*")
@@ -23,7 +43,7 @@ export default function IndividualPage() {
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [userId]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -32,7 +52,9 @@ export default function IndividualPage() {
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Individual 🙋</h2>
 
-        {campaigns.length === 0 && <p className="text-gray-400">No tienes campañas asignadas todavía.</p>}
+        {userId && campaigns.length === 0 && (
+          <p className="text-gray-400">No tienes campañas asignadas todavía.</p>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
           {campaigns.map((c, i) => (
