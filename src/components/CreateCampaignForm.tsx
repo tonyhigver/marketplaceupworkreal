@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useSession } from "@supabase/auth-helpers-react";
 
 interface CreateCampaignFormProps {
-  userId: string; // UUID real del usuario / empresa (ya no se usa para created_by, pero NO lo borro como pediste)
+  userId: string; // UUID real del usuario / empresa (ya no se usa para created_by, pero NO lo borro)
   onCreateCampaign: (campaign: any) => void;
 }
 
@@ -51,7 +51,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: session?.user?.email, // ← AQUI EL ÚNICO CAMBIO
+      created_by: session?.user?.email || null, // <-- ÚNICO CAMBIO
     };
 
     console.log("📤 Enviando campaña a Supabase:", campaignData);
