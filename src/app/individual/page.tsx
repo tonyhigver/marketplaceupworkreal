@@ -20,20 +20,20 @@ export default function IndividualPage() {
 
     if (!hasFetched.current) {
       hasFetched.current = true;
-      await fetchCampaigns(uid);
+      await fetchCampaigns();
     }
   };
 
-  // ✅ Cargar campañas del usuario
-  const fetchCampaigns = async (uid: string) => {
+  // ✅ Cargar todas las campañas disponibles para individuales
+  const fetchCampaigns = async () => {
     try {
       setLoadingCampaigns(true);
       setErrorMsg(null);
 
+      // Aquí eliminamos el filtro por created_by
       const { data, error } = await supabase
         .from("campaigns")
         .select("*")
-        .eq("created_by", uid)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -41,7 +41,7 @@ export default function IndividualPage() {
         setErrorMsg("Error al cargar campañas. Contacte a soporte.");
         setCampaigns([]);
       } else if (!data || data.length === 0) {
-        console.warn("⚠️ No se encontraron campañas para el usuario.");
+        console.warn("⚠️ No se encontraron campañas disponibles.");
         setCampaigns([]);
       } else {
         console.log("📦 Campañas cargadas para individual:", data);
@@ -64,12 +64,7 @@ export default function IndividualPage() {
       </div>
 
       {/* ✅ Header visible solo cuando hay usuario logueado */}
-      {userId && (
-        <Header
-          type="individual"
-          connects={15}
-        />
-      )}
+      {userId && <Header type="individual" connects={15} />}
 
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Individual 🙋</h2>
