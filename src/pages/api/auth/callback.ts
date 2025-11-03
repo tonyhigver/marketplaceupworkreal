@@ -51,13 +51,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const email = payload.email;
     const full_name = payload.name || "";
+    const google_sub = payload.sub;
 
-    // Guardar o actualizar usuario en tabla "users"
+    // Guardar o actualizar usuario en tabla "users" usando google_sub
     const { error: upsertError } = await supabase
       .from("users")
       .upsert(
-        { id: payload.sub, email, full_name },
-        { onConflict: "id" } // actualiza si ya existe
+        { google_sub, email, full_name },
+        { onConflict: "google_sub" } // actualiza si ya existe google_sub
       );
 
     if (upsertError) {
