@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const data = await response.json();
 
-    // Decodificar id_token para obtener información del usuario
+    // Decodificar id_token para obtener info del usuario
     const payload = data.id_token
       ? JSON.parse(Buffer.from(data.id_token.split(".")[1], "base64").toString())
       : null;
@@ -54,17 +54,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const google_sub = payload.sub; // identificador único de Google
 
     // Guardar o actualizar usuario en tabla "users"
-    // id se genera automáticamente en la tabla, no lo pasamos
-    const { error: upsertError } = await supabase
+    // No pasamos id para respetar la FK, solo google_sub
+    const { data: userData, error: upsertError } = await supabase
       .from("users")
       .upsert(
         { google_sub, email, full_name },
         { onConflict: "google_sub" } // actualiza si ya existe google_sub
-      );
+      )
+      .select()
+      .single();
 
     if (upsertError) {
       console.error("Error guardando usuario en Supabase:", upsertError);
-      return res.status(500).json({ error: upsertError.message }); // mensaje exacto
+      return res.status(500).json({ error: upsertError.message });
     }
 
     // Redirigir al frontend con token y email
