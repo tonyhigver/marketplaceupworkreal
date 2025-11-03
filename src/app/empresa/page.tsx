@@ -11,11 +11,8 @@ export default function EmpresaPage() {
 
   const fetchUserId = async () => {
     try {
-      const userRes = await supabase.auth.getUser();
-      const { data: sessionData } = await userRes;
-      if (!sessionData?.user?.id) return;
-
-      setUserId(sessionData.user.id);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) setUserId(user.id);
     } catch (err) {
       console.error("Error obteniendo UUID:", err);
     }
@@ -40,7 +37,7 @@ export default function EmpresaPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header siempre visible */}
+      {/* Header con botón de crear campaña */}
       <Header
         type="empresa"
         userId={userId ?? undefined}
