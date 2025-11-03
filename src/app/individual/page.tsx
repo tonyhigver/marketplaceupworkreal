@@ -1,76 +1,72 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
+import AuthHandler from "@/components/AuthHandler";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function IndividualPage() {
-  const [userId, setUserId] = useState<string | null>(null); // UUID real del usuario
+  const [userId, setUserId] = useState<string | null>(null);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  const fetchUserId = async () => {
-    try {
-      const user = supabase.auth.getUser(); // obtener usuario logueado
-      const { data: sessionData } = await user;
-      if (!sessionData?.user?.email) {
-        console.error("❌ No se encontró email del usuario autenticado");
-        return;
-      }
-      const email = sessionData.user.email;
-      console.log("📧 Email del usuario autenticado:", email);
-
-      const { data: userData, error } = await supabase
-        .from("users")
-        .select("id")
-        .eq("email", email)
-        .single();
-
-      if (error) {
-        console.error("❌ Error obteniendo UUID del usuario:", error);
-        return;
-      }
-
-      console.log("🆔 UUID del usuario obtenido:", userData.id);
-      setUserId(userData.id);
-    } catch (err) {
-      console.error("💥 Error inesperado al obtener UUID:", err);
-    }
+  // ✅ Cuando se loguee el usuario, cargamos sus campañas
+  const handleUser = async (uid: string) => {
+    console.log("🧭 Usuario logeado:", uid);
+    setUserId(uid);
+    await fetchCampaigns(uid);
   };
 
-  const fetchCampaigns = async () => {
-    if (!userId) return;
+  // ✅ Cargar campañas del usuario
+  const fetchCampaigns = async (uid: string) => {
+    setLoadingCampaigns(true);
     const { data, error } = await supabase
       .from("campaigns")
       .select("*")
-      .eq("created_by", userId);
-    if (error) console.error("❌ Error fetching campaigns:", error);
-    else {
-      console.log("📥 Campañas cargadas para individual:", data);
+      .eq("created_by", uid)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("❌ Error cargando campañas:", error.message);
+    } else {
+      console.log("📦 Campañas cargadas para individual:", data);
       setCampaigns(data || []);
     }
+    setLoadingCampaigns(false);
+    setInitialLoadDone(true);
   };
-
-  useEffect(() => {
-    fetchUserId();
-  }, []);
-
-  useEffect(() => {
-    fetchCampaigns();
-  }, [userId]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Header type="individual" connects={15} />
+      {/* 🔐 Manejo de autenticación */}
+      <div className="p-4">
+        <AuthHandler onUser={handleUser} />
+      </div>
+
+      {/* ✅ Header visible solo cuando hay usuario logueado */}
+      {userId && <Header type="individual" connects={15} />}
 
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Individual 🙋</h2>
 
-        {campaigns.length === 0 && <p className="text-gray-400">No tienes campañas asignadas todavía.</p>}
+        {/* Estado de carga solo en la primera carga */}
+        {loadingCampaigns && !initialLoadDone && (
+          <p className="text-gray-400">Cargando tus campañas...</p>
+        )}
 
+        {/* Si no hay campañas */}
+        {!loadingCampaigns && campaigns.length === 0 && initialLoadDone && (
+          <p className="text-gray-400">
+            No le sale ninguna, contacte a soporte.
+          </p>
+        )}
+
+        {/* Lista de campañas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-          {campaigns.map((c, i) => (
-            <ProjectCard key={i} title={c.campaign_name} reward={c.budget} />
+          {campaigns.map((c) => (
+            <ProjectCard key={c.id} title={c.campaign_name} reward={c.budget} />
           ))}
         </div>
       </div>
