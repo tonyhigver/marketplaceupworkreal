@@ -14,24 +14,24 @@ export default function CreateCampaignForm({
   onCreateCampaign,
   onClose,
 }: CreateCampaignFormProps) {
-  const [campaignName, setCampaignName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [campaignName, setCampaignName] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [budget, setBudget] = useState<number | null>(null);
-  const [objective, setObjective] = useState("");
+  const [objective, setObjective] = useState<string>("");
 
-  const [brandName, setBrandName] = useState("");
-  const [brandValues, setBrandValues] = useState("");
-  const [brandTone, setBrandTone] = useState("");
-  const [brandAssets, setBrandAssets] = useState("");
+  const [brandName, setBrandName] = useState<string>("");
+  const [brandValues, setBrandValues] = useState<string>("");
+  const [brandTone, setBrandTone] = useState<string>("");
+  const [brandAssets, setBrandAssets] = useState<string>("");
 
-  const [audience, setAudience] = useState("");
-  const [contentType, setContentType] = useState("");
-  const [contentGuidelines, setContentGuidelines] = useState("");
-  const [restrictions, setRestrictions] = useState("");
-  const [rewards, setRewards] = useState("");
-  const [successMetrics, setSuccessMetrics] = useState("");
-  const [references, setReferences] = useState("");
+  const [audience, setAudience] = useState<string>("");
+  const [contentType, setContentType] = useState<string>("");
+  const [contentGuidelines, setContentGuidelines] = useState<string>("");
+  const [restrictions, setRestrictions] = useState<string>("");
+  const [rewards, setRewards] = useState<string>("");
+  const [successMetrics, setSuccessMetrics] = useState<string>("");
+  const [references, setReferences] = useState<string>("");
 
   const handleSubmit = async () => {
     if (!userId) {
@@ -43,7 +43,7 @@ export default function CreateCampaignForm({
       campaign_name: campaignName || null,
       start_date: startDate || null,
       end_date: endDate || null,
-      budget: budget || null,
+      budget: budget ?? null,
       objective: objective || null,
       brand_name: brandName || null,
       brand_values: brandValues || null,
@@ -77,7 +77,6 @@ export default function CreateCampaignForm({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex justify-center items-center p-4">
-      {/* Contenedor del modal con scroll */}
       <div className="bg-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl border border-gray-700">
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-6 text-center">
