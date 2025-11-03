@@ -96,6 +96,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
 
   return (
     <>
+      {/* BOTÓN SIEMPRE VISIBLE */}
       <button
         className="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition"
         onClick={() => {
@@ -111,32 +112,29 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
           <div className="bg-gray-800 p-8 rounded-xl w-full max-w-3xl shadow-lg">
             <h2 className="text-xl font-bold mb-4">Nueva Campaña</h2>
             <div className="grid gap-3">
-              <input type="text" placeholder="Nombre de la campaña" value={campaignName} onChange={(e) => { console.log("campaignName:", e.target.value); setCampaignName(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Nombre de la campaña" value={campaignName} onChange={(e) => { setCampaignName(e.target.value); console.log("campaignName:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <div className="flex gap-2">
-                <input type="date" value={startDate} onChange={(e) => { console.log("startDate:", e.target.value); setStartDate(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-                <input type="date" value={endDate} onChange={(e) => { console.log("endDate:", e.target.value); setEndDate(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+                <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); console.log("startDate:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+                <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); console.log("endDate:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               </div>
-              <input type="number" placeholder="Presupuesto" value={budget ?? ""} onChange={(e) => { console.log("budget:", e.target.value); setBudget(e.target.value ? Number(e.target.value) : null)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <input type="text" placeholder="Objetivo principal" value={objective} onChange={(e) => { console.log("objective:", e.target.value); setObjective(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-
-              <input type="text" placeholder="Nombre de la marca" value={brandName} onChange={(e) => { console.log("brandName:", e.target.value); setBrandName(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <textarea placeholder="Valores de la marca" value={brandValues} onChange={(e) => { console.log("brandValues:", e.target.value); setBrandValues(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <input type="text" placeholder="Tono / Voz de la marca" value={brandTone} onChange={(e) => { console.log("brandTone:", e.target.value); setBrandTone(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <input type="text" placeholder="Link a assets / guía de estilo" value={brandAssets} onChange={(e) => { console.log("brandAssets:", e.target.value); setBrandAssets(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-
-              <textarea placeholder="Descripción del público objetivo" value={audience} onChange={(e) => { console.log("audience:", e.target.value); setAudience(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <input type="text" placeholder="Tipo de contenido" value={contentType} onChange={(e) => { console.log("contentType:", e.target.value); setContentType(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <textarea placeholder="Guías de contenido" value={contentGuidelines} onChange={(e) => { console.log("contentGuidelines:", e.target.value); setContentGuidelines(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-
-              <textarea placeholder="Reglas y restricciones" value={restrictions} onChange={(e) => { console.log("restrictions:", e.target.value); setRestrictions(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <input type="text" placeholder="Recompensas / incentivos" value={rewards} onChange={(e) => { console.log("rewards:", e.target.value); setRewards(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <textarea placeholder="Métricas de éxito" value={successMetrics} onChange={(e) => { console.log("successMetrics:", e.target.value); setSuccessMetrics(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
-              <textarea placeholder="Material de referencia / links" value={references} onChange={(e) => { console.log("references:", e.target.value); setReferences(e.target.value)}} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="number" placeholder="Presupuesto" value={budget ?? ""} onChange={(e) => { setBudget(e.target.value ? Number(e.target.value) : null); console.log("budget:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Objetivo principal" value={objective} onChange={(e) => { setObjective(e.target.value); console.log("objective:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Nombre de la marca" value={brandName} onChange={(e) => { setBrandName(e.target.value); console.log("brandName:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Valores de la marca" value={brandValues} onChange={(e) => { setBrandValues(e.target.value); console.log("brandValues:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Tono / Voz de la marca" value={brandTone} onChange={(e) => { setBrandTone(e.target.value); console.log("brandTone:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Link a assets / guía de estilo" value={brandAssets} onChange={(e) => { setBrandAssets(e.target.value); console.log("brandAssets:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Descripción del público objetivo" value={audience} onChange={(e) => { setAudience(e.target.value); console.log("audience:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Tipo de contenido" value={contentType} onChange={(e) => { setContentType(e.target.value); console.log("contentType:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Guías de contenido" value={contentGuidelines} onChange={(e) => { setContentGuidelines(e.target.value); console.log("contentGuidelines:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Reglas y restricciones" value={restrictions} onChange={(e) => { setRestrictions(e.target.value); console.log("restrictions:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <input type="text" placeholder="Recompensas / incentivos" value={rewards} onChange={(e) => { setRewards(e.target.value); console.log("rewards:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Métricas de éxito" value={successMetrics} onChange={(e) => { setSuccessMetrics(e.target.value); console.log("successMetrics:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+              <textarea placeholder="Material de referencia / links" value={references} onChange={(e) => { setReferences(e.target.value); console.log("references:", e.target.value) }} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
               <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition text-white">Crear</button>
-              <button onClick={() => { console.log("📌 Cerrando modal de crear campaña"); setShowModal(false)}} className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-white">Cancelar</button>
+              <button onClick={() => { console.log("📌 Cerrando modal de crear campaña"); setShowModal(false) }} className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-white">Cancelar</button>
             </div>
           </div>
         </div>
