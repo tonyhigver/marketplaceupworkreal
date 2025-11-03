@@ -10,27 +10,38 @@ export default function EmpresaPage() {
   const [userId, setUserId] = useState<string | null>(null); // UUID real del usuario
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  // Obtener la sesión de Supabase al cargar
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("❌ Error obteniendo sesión:", error);
+  // Obtener UUID real del usuario logueado
+  const fetchUserId = async () => {
+    try {
+      const user = supabase.auth.getUser(); // obtener usuario logueado
+      const { data: sessionData } = await user;
+      if (!sessionData?.user?.email) {
+        console.error("❌ No se encontró email del usuario autenticado");
         return;
       }
-      if (session?.user?.id) {
-        console.log("✅ UUID del usuario logueado:", session.user.id);
-        setUserId(session.user.id);
-      } else {
-        console.warn("⚠️ No hay usuario logueado");
+      const email = sessionData.user.email;
+      console.log("📧 Email del usuario autenticado:", email);
+
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("id")
+        .eq("email", email)
+        .single();
+
+      if (error) {
+        console.error("❌ Error obteniendo UUID del usuario:", error);
+        return;
       }
-    };
-    fetchSession();
-  }, []);
+
+      console.log("🆔 UUID del usuario obtenido:", userData.id);
+      setUserId(userData.id);
+    } catch (err) {
+      console.error("💥 Error inesperado al obtener UUID:", err);
+    }
+  };
 
   const fetchCampaigns = async () => {
     if (!userId) return;
-    console.log("📥 Cargando campañas para userId:", userId);
     const { data, error } = await supabase
       .from("campaigns")
       .select("*")
@@ -41,6 +52,10 @@ export default function EmpresaPage() {
       setCampaigns(data || []);
     }
   };
+
+  useEffect(() => {
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
     fetchCampaigns();
