@@ -1,25 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function EmpresaPage() {
-  const [userId, setUserId] = useState<string | null>(null);
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  const fetchUserId = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id) setUserId(user.id);
-    } catch (err) {
-      console.error("Error obteniendo UUID:", err);
-    }
-  };
-
-  const fetchCampaigns = async () => {
-    if (!userId) return;
+  // Cargar campañas solo cuando se obtenga el userId
+  const fetchCampaigns = async (userId: string) => {
     const { data, error } = await supabase
       .from("campaigns")
       .select("*")
@@ -27,20 +17,11 @@ export default function EmpresaPage() {
     if (!error) setCampaigns(data || []);
   };
 
-  useEffect(() => {
-    fetchUserId();
-  }, []);
-
-  useEffect(() => {
-    fetchCampaigns();
-  }, [userId]);
-
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header con botón de crear campaña */}
+      {/* Header con botón Crear Campaña */}
       <Header
         type="empresa"
-        userId={userId ?? undefined}
         onCreateCampaign={(c) => setCampaigns((prev) => [...prev, c])}
       />
 
