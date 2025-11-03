@@ -1,21 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function EmpresaPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
-
-  // Cargar campañas solo cuando se obtenga el userId
-  const fetchCampaigns = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("campaigns")
-      .select("*")
-      .eq("created_by", userId);
-    if (!error) setCampaigns(data || []);
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

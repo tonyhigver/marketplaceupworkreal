@@ -14,7 +14,7 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
   const [userId, setUserId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Obtener userId automáticamente desde supabase y tabla users
+  // Obtener userId desde Supabase
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -42,18 +42,24 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
 
       {type === "empresa" && (
         <div>
+          {/* Botón Crear Campaña */}
           <button
             className="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition"
-            onClick={() => {
-              if (!userId) return; // todavía no se cargó
-              setShowForm(true);
-            }}
+            onClick={() => setShowForm(true)}
+            disabled={!userId}
           >
-            Crear Campaña
+            {userId ? "Crear Campaña" : "Cargando..."}
           </button>
 
+          {/* Mostrar el formulario completo cuando showForm es true */}
           {showForm && userId && onCreateCampaign && (
-            <CreateCampaignForm userId={userId} onCreateCampaign={onCreateCampaign} />
+            <CreateCampaignForm
+              userId={userId}
+              onCreateCampaign={(campaign) => {
+                onCreateCampaign(campaign);
+                setShowForm(false); // cerrar formulario después de crear campaña
+              }}
+            />
           )}
         </div>
       )}
