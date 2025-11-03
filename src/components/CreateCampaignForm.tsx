@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useSession } from "@supabase/auth-helpers-react";
 
 interface CreateCampaignFormProps {
-  userId: string; // UUID real del usuario / empresa (ya no se usa para created_by, pero NO lo borro)
+  userId: string; // Puedes pasar el userId obtenido desde tu callback de login
   onCreateCampaign: (campaign: any) => void;
 }
 
 export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateCampaignFormProps) {
   const [showModal, setShowModal] = useState(false);
-  const session = useSession();
 
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -34,8 +32,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
-    // ✅ Guard: asegurarse de que el usuario está logueado
-    if (!session?.user?.email) {
+    if (!userId) {
       alert("Debes iniciar sesión para crear campañas");
       return;
     }
@@ -57,7 +54,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: session?.user?.email || null, // <-- ÚNICO CAMBIO
+      created_by: userId, // usamos directamente el userId
     };
 
     console.log("📤 Enviando campaña a Supabase:", campaignData);
@@ -79,6 +76,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       onCreateCampaign(data);
       setShowModal(false);
 
+      // Limpiar campos
       setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(0); setObjective("");
       setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
       setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
