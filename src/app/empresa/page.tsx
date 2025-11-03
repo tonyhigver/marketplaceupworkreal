@@ -9,9 +9,11 @@ export default function EmpresaPage() {
   const [userId, setUserId] = useState<string | null>(null); // UUID real del usuario
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
+  // Obtener UUID real del usuario logueado
   const fetchUserId = async () => {
     try {
-      const { data: sessionData } = await supabase.auth.getUser();
+      const user = supabase.auth.getUser(); // obtener usuario logueado
+      const { data: sessionData } = await user;
       if (!sessionData?.user?.email) {
         console.error("❌ No se encontró email del usuario autenticado");
         return;
@@ -60,10 +62,10 @@ export default function EmpresaPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* PASAMOS userId y onCreateCampaign al Header */}
+      {/* PASAR userId y callback onCreateCampaign al Header */}
       <Header
         type="empresa"
-        userId={userId || undefined}
+        userId={userId ?? undefined}
         onCreateCampaign={(c) => setCampaigns((prev) => [...prev, c])}
       />
 
