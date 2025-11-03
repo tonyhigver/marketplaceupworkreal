@@ -1,4 +1,3 @@
-// src/pages/api/auth/callback.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -51,15 +50,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const email = payload.email;
     const full_name = payload.name || "";
-    const google_sub = payload.sub; // identificador único de Google
+    const google_sub = payload.sub;
 
     // Guardar o actualizar usuario en tabla "users"
-    // No pasamos id para respetar la FK, solo google_sub
     const { data: userData, error: upsertError } = await supabase
       .from("users")
       .upsert(
         { google_sub, email, full_name },
-        { onConflict: "google_sub" } // actualiza si ya existe google_sub
+        { onConflict: "google_sub" }
       )
       .select()
       .single();
@@ -69,8 +67,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: upsertError.message });
     }
 
-    // Redirigir al frontend con token y email
-    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL || "/"}?token=${data.access_token}&email=${email}`);
+    // Redirigir al frontend con token y UUID real de usuario
+    res.redirect(
+      `${process.env.NEXT_PUBLIC_APP_URL || "/"}?token=${data.access_token}&userId=${userData.id}`
+    );
   } catch (err) {
     console.error("Error inesperado en callback de Google OAuth:", err);
     res.status(500).json({ error: "Error interno del servidor" });
