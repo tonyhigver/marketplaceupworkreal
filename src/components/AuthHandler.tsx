@@ -26,12 +26,12 @@ export default function AuthHandler({ onUser }: AuthHandlerProps) {
         console.log("✅ Usuario activo:", session.user.id);
         setUserId(session.user.id);
         onUser(session.user.id);
-        setLoading(false);
       } else {
         console.log("⚠️ No hay sesión activa");
         setUserId(null);
-        setLoading(false);
       }
+
+      setLoading(false);
 
       // ✅ Escuchar cambios de autenticación (login/logout)
       const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -53,22 +53,33 @@ export default function AuthHandler({ onUser }: AuthHandlerProps) {
     initAuth();
   }, [onUser]);
 
-  // ✅ Iniciar sesión con Google
+  // ✅ Iniciar sesión con Google (redirige correctamente según entorno)
   const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/empresa`, // vuelve al dashboard
-      },
-    });
-    if (error) console.error("❌ Error iniciando sesión con Google:", error.message);
+    try {
+      const redirectUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${redirectUrl}/empresa`, // vuelve al dashboard empresa
+        },
+      });
+
+      if (error) console.error("❌ Error iniciando sesión con Google:", error.message);
+    } catch (err) {
+      console.error("❌ Error inesperado al iniciar sesión:", err);
+    }
   };
 
   // ✅ Cerrar sesión
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) console.error("❌ Error cerrando sesión:", error.message);
-    else console.log("👋 Sesión cerrada correctamente");
+    else {
+      console.log("👋 Sesión cerrada correctamente");
+      setUserId(null);
+    }
   };
 
   // 🧩 Renderizado del estado
