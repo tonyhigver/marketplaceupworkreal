@@ -1,78 +1,51 @@
-// src/pages/api/auth/callback.ts
-import type { NextApiRequest, NextApiResponse } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const code = req.query.code as string;
+export default function GoogleLoginCallback({ onLogin }: { onLogin: (userId: string) => void }) {
+  const [loading, setLoading] = useState(true);
 
-    if (!code) {
-      return res.status(400).json({ error: "Falta el parámetro 'code' en la query" });
-    }
+  useEffect(() => {
+    const handleAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-    const client_id = process.env.GOOGLE_CLIENT_ID;
-    const client_secret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirect_uri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+      if (error || !session?.user) {
+        console.error("❌ Error al obtener sesión:", error);
+        setLoading(false);
+        return;
+      }
 
-    if (!client_id || !client_secret || !redirect_uri) {
-      return res.status(500).json({ error: "Faltan variables de entorno de Google OAuth" });
-    }
+      const user = session.user;
 
-    // Intercambiar código por token
-    const params = new URLSearchParams();
-    params.append("code", code);
-    params.append("client_id", client_id);
-    params.append("client_secret", client_secret);
-    params.append("redirect_uri", redirect_uri);
-    params.append("grant_type", "authorization_code");
+      // Upsert del usuario en la tabla "users" para obtener UUID
+      const { data: userData, error: upsertError } = await supabase
+        .from("users")
+        .upsert(
+          {
+            id: user.id,            // UUID proporcionado por Supabase Auth
+            email: user.email,
+            full_name: user.user_metadata.full_name || user.email,
+          },
+          { onConflict: "id", returning: "representation" } // devolver fila insertada/actualizada
+        )
+        .select()
+        .single();
 
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
-    });
+      if (upsertError) {
+        console.error("❌ Error al registrar usuario:", upsertError);
+        setLoading(false);
+        return;
+      }
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("Error intercambiando código por token:", text);
-      return res.status(500).json({ error: "Error al intercambiar código por token" });
-    }
+      console.log("✅ Usuario autenticado con UUID:", userData.id);
+      onLogin(userData.id); // <-- enviamos UUID al frontend
+      setLoading(false);
+    };
 
-    const data = await response.json();
+    handleAuth();
+  }, [onLogin]);
 
-    // Decodificar id_token para obtener info del usuario
-    const payload = data.id_token
-      ? JSON.parse(Buffer.from(data.id_token.split(".")[1], "base64").toString())
-      : null;
-
-    if (!payload?.email) {
-      return res.status(500).json({ error: "No se pudo obtener el email del token" });
-    }
-
-    const email = payload.email;
-    const full_name = payload.name || "";
-    const google_sub = payload.sub; // identificador único de Google
-
-    // Guardar o actualizar usuario en tabla "users"
-    // No pasamos id para respetar la FK, solo google_sub
-    const { data: userData, error: upsertError } = await supabase
-      .from("users")
-      .upsert(
-        { google_sub, email, full_name },
-        { onConflict: "google_sub" } // actualiza si ya existe google_sub
-      )
-      .select()
-      .single();
-
-    if (upsertError) {
-      console.error("Error guardando usuario en Supabase:", upsertError);
-      return res.status(500).json({ error: upsertError.message });
-    }
-
-    // Redirigir al frontend con token y email
-    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL || "/"}?token=${data.access_token}&email=${email}`);
-  } catch (err) {
-    console.error("Error inesperado en callback de Google OAuth:", err);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
+  if (loading) return <div>Cargando sesión...</div>;
+  return null;
 }
