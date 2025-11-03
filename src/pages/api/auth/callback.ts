@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const email = payload.email;
     const full_name = payload.name || "";
-    const google_sub = payload.sub;
+    const google_sub = payload.sub; // identificador único de Google
 
     // Guardar o actualizar usuario en tabla "users" usando google_sub
     const { error: upsertError } = await supabase
@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (upsertError) {
       console.error("Error guardando usuario:", upsertError);
-      return res.status(500).json({ error: "Error guardando usuario en Supabase" });
+      return res.status(500).json({ error: upsertError.message }); // <-- mostrar mensaje exacto
     }
 
     // Redirigir al frontend con token y email
