@@ -37,7 +37,7 @@ export default function IndividualPage() {
           campaign_name,
           budget,
           created_by,
-          users(id, full_name)
+          users(id, full_name, email)
         `)
         .order("created_at", { ascending: false });
 
@@ -74,7 +74,7 @@ export default function IndividualPage() {
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Individual 🙋</h2>
 
-        {/* 🌀 Estado de carga (solo primera vez) */}
+        {/* 🌀 Estado de carga */}
         {loadingCampaigns && !errorMsg && campaigns.length === 0 && (
           <p className="text-gray-400">Cargando tus campañas...</p>
         )}
@@ -92,7 +92,7 @@ export default function IndividualPage() {
             {campaigns.map((c) => (
               <ProjectCard
                 key={c.id}
-                title={`${c.campaign_name} - ${c.users?.full_name || "Sin nombre"}`}
+                title={`${c.campaign_name} - ${c.users?.full_name || c.users?.email || "Sin nombre"}`}
                 reward={c.budget}
               />
             ))}
