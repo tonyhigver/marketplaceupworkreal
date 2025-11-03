@@ -3,49 +3,56 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function GoogleLoginCallback({ onLogin }: { onLogin: (userId: string) => void }) {
+export default function AuthCallback({ onUser }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+    const fetchUser = async () => {
+      setLoading(true);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Error obteniendo sesión:", sessionError);
+        setLoading(false);
+        return;
+      }
 
-      if (error || !session?.user) {
-        console.error("❌ Error al obtener sesión:", error);
+      if (!session) {
         setLoading(false);
         return;
       }
 
       const user = session.user;
 
-      // Upsert del usuario en la tabla "users" para obtener UUID
+      // Upsert en tabla 'users' para obtener el UUID correcto
       const { data: userData, error: upsertError } = await supabase
         .from("users")
         .upsert(
           {
-            id: user.id,            // UUID proporcionado por Supabase Auth
+            id: user.id, // ✅ UUID generado por Supabase
             email: user.email,
-            full_name: user.user_metadata.full_name || user.email,
+            full_name: user.user_metadata.full_name || null
           },
-          { onConflict: "id", returning: "representation" } // devolver fila insertada/actualizada
+          { onConflict: "id", returning: "representation" }
         )
         .select()
         .single();
 
       if (upsertError) {
-        console.error("❌ Error al registrar usuario:", upsertError);
+        console.error("Error al guardar usuario:", upsertError);
         setLoading(false);
         return;
       }
 
-      console.log("✅ Usuario autenticado con UUID:", userData.id);
-      onLogin(userData.id); // <-- enviamos UUID al frontend
+      console.log("Usuario logueado con UUID:", userData.id);
+
+      // Pasamos al frontend
+      onUser(userData.id); // ✅ Esto será el userId que usarás en CreateCampaignForm
       setLoading(false);
     };
 
-    handleAuth();
-  }, [onLogin]);
+    fetchUser();
+  }, [onUser]);
 
-  if (loading) return <div>Cargando sesión...</div>;
+  if (loading) return <div>Cargando...</div>;
   return null;
 }

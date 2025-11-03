@@ -54,7 +54,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
       rewards: rewards || null,
       success_metrics: successMetrics || null,
       references: references || null,
-      created_by: userId, // ✅ UUID real
+      created_by: userId, // ✅ Usamos el UUID real
     };
 
     console.log("📤 Creando campaña con datos:", campaignData);
@@ -109,13 +109,16 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
               </div>
               <input type="number" placeholder="Presupuesto" value={budget ?? ""} onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Objetivo principal" value={objective} onChange={(e) => setObjective(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+
               <input type="text" placeholder="Nombre de la marca" value={brandName} onChange={(e) => setBrandName(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <textarea placeholder="Valores de la marca" value={brandValues} onChange={(e) => setBrandValues(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Tono / Voz de la marca" value={brandTone} onChange={(e) => setBrandTone(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Link a assets / guía de estilo" value={brandAssets} onChange={(e) => setBrandAssets(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+
               <textarea placeholder="Descripción del público objetivo" value={audience} onChange={(e) => setAudience(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Tipo de contenido" value={contentType} onChange={(e) => setContentType(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <textarea placeholder="Guías de contenido" value={contentGuidelines} onChange={(e) => setContentGuidelines(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
+
               <textarea placeholder="Reglas y restricciones" value={restrictions} onChange={(e) => setRestrictions(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <input type="text" placeholder="Recompensas / incentivos" value={rewards} onChange={(e) => setRewards(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
               <textarea placeholder="Métricas de éxito" value={successMetrics} onChange={(e) => setSuccessMetrics(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
