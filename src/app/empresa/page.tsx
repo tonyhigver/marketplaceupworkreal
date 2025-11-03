@@ -3,18 +3,15 @@
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-import CreateCampaignForm from "@/components/CreateCampaignForm";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function EmpresaPage() {
   const [userId, setUserId] = useState<string | null>(null); // UUID real del usuario
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  // Obtener UUID real del usuario logueado
   const fetchUserId = async () => {
     try {
-      const user = supabase.auth.getUser(); // obtener usuario logueado
-      const { data: sessionData } = await user;
+      const { data: sessionData } = await supabase.auth.getUser();
       if (!sessionData?.user?.email) {
         console.error("❌ No se encontró email del usuario autenticado");
         return;
@@ -63,19 +60,15 @@ export default function EmpresaPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Header type="empresa" />
+      {/* PASAMOS userId y onCreateCampaign al Header */}
+      <Header
+        type="empresa"
+        userId={userId || undefined}
+        onCreateCampaign={(c) => setCampaigns((prev) => [...prev, c])}
+      />
 
       <div className="p-10">
         <h2 className="text-3xl font-bold mb-8">Dashboard Empresa / Startup 🚀</h2>
-
-        <div className="mb-6">
-          {userId && (
-            <CreateCampaignForm
-              userId={userId}
-              onCreateCampaign={(c) => setCampaigns((prev) => [...prev, c])}
-            />
-          )}
-        </div>
 
         {campaigns.length === 0 && <p className="text-gray-400">No tienes campañas creadas todavía.</p>}
 
