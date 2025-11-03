@@ -4,12 +4,13 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface CreateCampaignFormProps {
-  userId: string;
+  userId: string; // UUID real del usuario logueado
   onCreateCampaign: (campaign: any) => void;
-  onClose?: () => void; // para cerrar el modal desde Header
 }
 
-export default function CreateCampaignForm({ userId, onCreateCampaign, onClose }: CreateCampaignFormProps) {
+export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateCampaignFormProps) {
+  const [showModal, setShowModal] = useState(true); // ✅ Siempre se abre el formulario al crear campaña
+
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -69,25 +70,25 @@ export default function CreateCampaignForm({ userId, onCreateCampaign, onClose }
       }
 
       onCreateCampaign(data);
+      setShowModal(false);
 
       // Limpiar campos
       setCampaignName(""); setStartDate(""); setEndDate(""); setBudget(null); setObjective("");
       setBrandName(""); setBrandValues(""); setBrandTone(""); setBrandAssets("");
       setAudience(""); setContentType(""); setContentGuidelines(""); setRestrictions("");
       setRewards(""); setSuccessMetrics(""); setReferences("");
-
-      if (onClose) onClose();
     } catch (err) {
-      console.error(err);
       alert("Error inesperado al crear la campaña");
+      console.error(err);
     }
   };
+
+  if (!showModal) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex justify-center items-center overflow-auto p-4">
       <div className="bg-gray-800 p-8 rounded-xl w-full max-w-3xl shadow-lg">
         <h2 className="text-xl font-bold mb-4">Nueva Campaña</h2>
-
         <div className="grid gap-3">
           <input type="text" placeholder="Nombre de la campaña" value={campaignName} onChange={(e) => setCampaignName(e.target.value)} className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"/>
           <div className="flex gap-2">
@@ -111,7 +112,7 @@ export default function CreateCampaignForm({ userId, onCreateCampaign, onClose }
 
         <div className="flex justify-end gap-2 mt-4">
           <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition text-white">Crear</button>
-          <button onClick={onClose} className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-white">Cancelar</button>
+          <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-white">Cancelar</button>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function EmpresaPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
