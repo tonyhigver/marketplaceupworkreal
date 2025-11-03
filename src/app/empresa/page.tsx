@@ -13,16 +13,9 @@ export default function EmpresaPage() {
     try {
       const userRes = await supabase.auth.getUser();
       const { data: sessionData } = await userRes;
-      if (!sessionData?.user?.email) return;
-      const email = sessionData.user.email;
+      if (!sessionData?.user?.id) return;
 
-      const { data: userData, error } = await supabase
-        .from("users")
-        .select("id")
-        .eq("email", email)
-        .single();
-
-      if (!error && userData?.id) setUserId(userData.id);
+      setUserId(sessionData.user.id);
     } catch (err) {
       console.error("Error obteniendo UUID:", err);
     }
@@ -47,7 +40,7 @@ export default function EmpresaPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header con botón de crear campaña */}
+      {/* Header siempre visible */}
       <Header
         type="empresa"
         userId={userId ?? undefined}
