@@ -34,6 +34,12 @@ export default function CreateCampaignForm({ userId, onCreateCampaign }: CreateC
   const [references, setReferences] = useState("");
 
   const handleSubmit = async () => {
+    // ✅ Guard: asegurarse de que el usuario está logueado
+    if (!session?.user?.email) {
+      alert("Debes iniciar sesión para crear campañas");
+      return;
+    }
+
     const campaignData = {
       campaign_name: campaignName || null,
       start_date: startDate || null,
