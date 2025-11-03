@@ -24,7 +24,7 @@ export default function IndividualPage() {
     }
   };
 
-  // ✅ Cargar todas las campañas junto con el nombre del usuario
+  // ✅ Cargar todas las campañas junto con el nombre/email del usuario
   const fetchCampaigns = async () => {
     try {
       setLoadingCampaigns(true);
@@ -37,7 +37,7 @@ export default function IndividualPage() {
           campaign_name,
           budget,
           created_by,
-          users(id, full_name, email)
+          users(id, email)
         `)
         .order("created_at", { ascending: false });
 
@@ -92,7 +92,7 @@ export default function IndividualPage() {
             {campaigns.map((c) => (
               <ProjectCard
                 key={c.id}
-                title={`${c.campaign_name} - ${c.users?.full_name || c.users?.email || "Sin nombre"}`}
+                title={`${c.campaign_name} - ${c.users?.email || "Sin nombre"}`}
                 reward={c.budget}
               />
             ))}
