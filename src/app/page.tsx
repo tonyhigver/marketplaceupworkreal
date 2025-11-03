@@ -11,26 +11,40 @@ export default function Home() {
 
   useEffect(() => {
     const checkSession = async () => {
-      // 🔹 Verificar si ya existe sesión activa
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        console.log("✅ Usuario logeado:", session.user.id);
-        setUser(session.user);
-        router.replace("/empresa"); // 🚀 redirigir directamente
+      console.log("🟡 Verificando sesión en Supabase...");
+
+      const { data, error } = await supabase.auth.getSession();
+
+      console.log("🔹 Resultado getSession:", data, error);
+
+      if (error) {
+        console.error("❌ Error obteniendo sesión:", error.message);
+        setLoading(false);
+        return;
       }
+
+      if (data?.session?.user) {
+        console.log("✅ Sesión activa:", data.session.user.id);
+        setUser(data.session.user);
+        router.replace("/empresa"); // 🚀 Redirigir al dashboard de empresa
+      } else {
+        console.log("⚠️ No hay sesión activa.");
+      }
+
       setLoading(false);
     };
 
     checkSession();
 
-    // 🔹 Escuchar cambios de autenticación (login/logout)
+    // 👂 Escuchar cambios de autenticación (login/logout)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("🔄 Cambio de sesión detectado:", _event, session);
       if (session?.user) {
-        console.log("🔄 Sesión actualizada:", session.user.id);
+        console.log("✅ Nuevo usuario logeado:", session.user.id);
         setUser(session.user);
         router.replace("/empresa");
       } else {
-        console.log("🚪 Sesión cerrada");
+        console.log("🚪 Usuario cerró sesión.");
         setUser(null);
       }
     });
@@ -42,10 +56,12 @@ export default function Home() {
     const redirectUrl =
       process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
+    console.log("🌐 Redirigiendo login a:", `${redirectUrl}/empresa`);
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${redirectUrl}/empresa`, // ✅ vuelve al dashboard de empresa
+        redirectTo: `${redirectUrl}/empresa`,
       },
     });
 
