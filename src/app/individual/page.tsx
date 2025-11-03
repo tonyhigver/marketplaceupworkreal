@@ -13,7 +13,7 @@ export default function IndividualPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasFetched = useRef(false); // ✅ Evita recargar varias veces
 
-  // ✅ Cuando se loguee el usuario, cargamos sus campañas una sola vez
+  // ✅ Cuando se loguee el usuario, cargamos las campañas una sola vez
   const handleUser = async (uid: string) => {
     console.log("🧭 Usuario logueado:", uid);
     setUserId(uid);
@@ -24,16 +24,21 @@ export default function IndividualPage() {
     }
   };
 
-  // ✅ Cargar todas las campañas disponibles para individuales
+  // ✅ Cargar todas las campañas junto con el nombre del usuario
   const fetchCampaigns = async () => {
     try {
       setLoadingCampaigns(true);
       setErrorMsg(null);
 
-      // Aquí eliminamos el filtro por created_by
       const { data, error } = await supabase
         .from("campaigns")
-        .select("*")
+        .select(`
+          id,
+          campaign_name,
+          budget,
+          created_by,
+          users(id, full_name)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -85,7 +90,11 @@ export default function IndividualPage() {
         {!loadingCampaigns && campaigns.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {campaigns.map((c) => (
-              <ProjectCard key={c.id} title={c.campaign_name} reward={c.budget} />
+              <ProjectCard
+                key={c.id}
+                title={`${c.campaign_name} - ${c.users?.full_name || "Sin nombre"}`}
+                reward={c.budget}
+              />
             ))}
           </div>
         )}
