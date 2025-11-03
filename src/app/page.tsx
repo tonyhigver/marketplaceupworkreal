@@ -22,15 +22,15 @@ export default function Home() {
         console.log("✅ Sesión activa:", currentUser.email);
         setUser(currentUser);
 
-        // 🔹 Verificar si el usuario ya tiene un rol guardado
+        // 🔹 Buscar usuario por email en la tabla users
         const { data: existingUser, error: userError } = await supabase
           .from("users")
           .select("role")
-          .eq("id", currentUser.id)
+          .eq("email", currentUser.email)
           .maybeSingle();
 
         if (userError) {
-          console.error("❌ Error verificando usuario:", userError.message);
+          console.error("❌ Error buscando usuario:", userError.message);
         }
 
         if (!existingUser) {
@@ -82,13 +82,12 @@ export default function Home() {
     if (error) console.error("❌ Error al iniciar sesión:", error.message);
   };
 
-  // ✅ Guardar elección de rol en Supabase
+  // ✅ Guardar elección de rol en Supabase (por email)
   const handleSelectRole = async (selectedRole: string) => {
     if (!user) return;
 
     const { error } = await supabase.from("users").insert([
       {
-        id: user.id,
         email: user.email,
         role: selectedRole,
       },
