@@ -14,12 +14,32 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
   const [userId, setUserId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  // ✅ Obtener el UUID real del usuario logueado directamente desde Supabase Auth
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUserId(user.id); // <--- aquí ya tienes UUID real
+    const fetchUserId = async () => {
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
+
+        if (error) {
+          console.error("Error obteniendo usuario:", error);
+          return;
+        }
+
+        if (user?.id) {
+          console.log("✅ UUID del usuario logeado:", user.id);
+          setUserId(user.id);
+        } else {
+          console.warn("⚠️ No hay usuario logeado");
+        }
+      } catch (err) {
+        console.error("💥 Error obteniendo UUID desde Header:", err);
+      }
     };
-    fetchUser();
+
+    fetchUserId();
   }, []);
 
   return (
@@ -28,20 +48,26 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
 
       {type === "empresa" && (
         <div>
+          {/* ✅ Botón que abre el formulario completo */}
           <button
             className="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition"
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              console.log("📌 Click en Crear Campaña desde Header");
+              setShowForm(true);
+            }}
             disabled={!userId}
           >
             {userId ? "Crear Campaña" : "Cargando..."}
           </button>
 
-          {showForm && userId && onCreateCampaign && (
+          {/* ✅ Mostrar modal del formulario cuando showForm es true */}
+          {showForm && userId && (
             <CreateCampaignForm
               userId={userId}
               onCreateCampaign={(campaign) => {
-                onCreateCampaign(campaign);
-                setShowForm(false);
+                console.log("🎉 Campaña creada:", campaign);
+                onCreateCampaign?.(campaign);
+                setShowForm(false); // cerrar formulario después de crear
               }}
             />
           )}
