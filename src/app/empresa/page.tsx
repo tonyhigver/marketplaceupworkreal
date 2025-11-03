@@ -3,14 +3,12 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function EmpresaPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header con botón Crear Campaña */}
       <Header
         type="empresa"
         onCreateCampaign={(c) => setCampaigns((prev) => [...prev, c])}

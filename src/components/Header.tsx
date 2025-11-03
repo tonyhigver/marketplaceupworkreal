@@ -14,26 +14,12 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
   const [userId, setUserId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Obtener userId desde Supabase
   useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user?.email) return;
-
-        const { data: userData, error } = await supabase
-          .from("users")
-          .select("id")
-          .eq("email", user.email)
-          .single();
-
-        if (!error && userData?.id) setUserId(userData.id);
-      } catch (err) {
-        console.error("Error obteniendo UUID desde Header:", err);
-      }
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) setUserId(user.id); // <--- aquí ya tienes UUID real
     };
-
-    fetchUserId();
+    fetchUser();
   }, []);
 
   return (
@@ -42,7 +28,6 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
 
       {type === "empresa" && (
         <div>
-          {/* Botón Crear Campaña */}
           <button
             className="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition"
             onClick={() => setShowForm(true)}
@@ -51,13 +36,12 @@ export default function Header({ type, connects = 0, onCreateCampaign }: HeaderP
             {userId ? "Crear Campaña" : "Cargando..."}
           </button>
 
-          {/* Mostrar el formulario completo cuando showForm es true */}
           {showForm && userId && onCreateCampaign && (
             <CreateCampaignForm
               userId={userId}
               onCreateCampaign={(campaign) => {
                 onCreateCampaign(campaign);
-                setShowForm(false); // cerrar formulario después de crear campaña
+                setShowForm(false);
               }}
             />
           )}
