@@ -12,9 +12,8 @@ export default function EmpresaPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const hasFetched = useRef(false); // ✅ Evita recargar varias veces
+  const hasFetched = useRef(false);
 
-  // ✅ Cuando se loguee el usuario, cargamos todas las campañas
   const handleUser = async (uid: string) => {
     console.log("🧭 Usuario logueado:", uid);
     setUserId(uid);
@@ -25,7 +24,6 @@ export default function EmpresaPage() {
     }
   };
 
-  // ✅ Cargar todas las campañas junto con el email del creador
   const fetchCampaigns = async () => {
     try {
       setLoadingCampaigns(true);
@@ -38,6 +36,15 @@ export default function EmpresaPage() {
           campaign_name,
           budget,
           created_by,
+          objective,
+          brand_name,
+          audience,
+          content_type,
+          content_guidelines,
+          restrictions,
+          rewards,
+          success_metrics,
+          references,
           users(id, email)
         `)
         .order("created_at", { ascending: false });
@@ -64,12 +71,10 @@ export default function EmpresaPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* 🔐 Manejo de autenticación */}
       <div className="p-4">
         <AuthHandler onUser={handleUser} />
       </div>
 
-      {/* ✅ Header visible solo cuando hay usuario logueado */}
       {userId && (
         <Header
           type="empresa"
@@ -84,21 +89,16 @@ export default function EmpresaPage() {
           Dashboard Empresa / Startup 🚀
         </h2>
 
-        {/* 🌀 Estado de carga */}
         {loadingCampaigns && !errorMsg && campaigns.length === 0 && (
           <p className="text-gray-400">Cargando tus campañas...</p>
         )}
 
-        {/* ⚠️ Mensaje de error o sin campañas */}
         {!loadingCampaigns && campaigns.length === 0 && (
           <p className="text-gray-400">
-            {errorMsg
-              ? errorMsg
-              : "No le sale ninguna, contacte a soporte."}
+            {errorMsg ? errorMsg : "No le sale ninguna, contacte a soporte."}
           </p>
         )}
 
-        {/* ✅ Lista de campañas */}
         {!loadingCampaigns && campaigns.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {campaigns.map((c) => (
@@ -113,7 +113,6 @@ export default function EmpresaPage() {
         )}
       </div>
 
-      {/* ✅ Modal de campaña seleccionada */}
       {selectedCampaign && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-20 z-50">
           <div className="bg-gray-800 p-6 rounded-xl w-11/12 max-w-2xl text-white">
