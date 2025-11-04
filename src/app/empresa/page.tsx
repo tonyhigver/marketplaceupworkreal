@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Header from "@/components/Header";
 import ProjectCard from "@/components/ProjectCard";
 import AuthHandler from "@/components/AuthHandler";
@@ -13,27 +13,32 @@ export default function EmpresaPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const hasFetched = useRef(false); // ✅ Evita recargar varias veces
 
-  // ✅ Cuando se loguee el usuario, cargamos sus campañas una sola vez
+  // ✅ Cuando se loguee el usuario, cargamos todas las campañas
   const handleUser = async (uid: string) => {
     console.log("🧭 Usuario logueado:", uid);
     setUserId(uid);
 
     if (!hasFetched.current) {
       hasFetched.current = true;
-      await fetchCampaigns(uid);
+      await fetchCampaigns();
     }
   };
 
-  // ✅ Cargar campañas del usuario
-  const fetchCampaigns = async (uid: string) => {
+  // ✅ Cargar todas las campañas junto con el email del creador
+  const fetchCampaigns = async () => {
     try {
       setLoadingCampaigns(true);
       setErrorMsg(null);
 
       const { data, error } = await supabase
         .from("campaigns")
-        .select("*")
-        .eq("created_by", uid)
+        .select(`
+          id,
+          campaign_name,
+          budget,
+          created_by,
+          users(id, email)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -41,7 +46,7 @@ export default function EmpresaPage() {
         setErrorMsg("Error al cargar campañas. Contacte a soporte.");
         setCampaigns([]);
       } else if (!data || data.length === 0) {
-        console.warn("⚠️ No se encontraron campañas para el usuario.");
+        console.warn("⚠️ No se encontraron campañas disponibles.");
         setCampaigns([]);
       } else {
         console.log("📦 Campañas cargadas:", data);
@@ -78,7 +83,7 @@ export default function EmpresaPage() {
           Dashboard Empresa / Startup 🚀
         </h2>
 
-        {/* 🌀 Estado de carga (solo primera vez) */}
+        {/* 🌀 Estado de carga */}
         {loadingCampaigns && !errorMsg && campaigns.length === 0 && (
           <p className="text-gray-400">Cargando tus campañas...</p>
         )}
@@ -98,7 +103,7 @@ export default function EmpresaPage() {
             {campaigns.map((c) => (
               <ProjectCard
                 key={c.id}
-                title={c.campaign_name}
+                title={`${c.campaign_name} - ${c.users?.email || "Sin nombre"}`}
                 reward={c.budget}
               />
             ))}
